@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<style>
+			form {
+				display: flex;
+				flex-direction: column;
+			}
+			form > div {
+				display: flex;
+				justify-content: space-around;
+			}
+			form > div > label > * {
+				vertical-align: middle;
+			}
+			button {
+				text-align: center;
+				margin-top: 20px;
+			}
+		</style>
+		<script src="options.js"></script>
+	</head>
+	<body>
+		<form id="form" style="display: none;">
+			<h3 id="optionChooseBookmark"></h3>
+			<div>
+				<label>
+					<input type="checkbox" id="fav_bar" checked="checked" />
+					<span id="optionChooseBookmarkBar"></span>
+				</label>
+				<label>
+					<input type="checkbox" id="fav_other" checked="checked" />
+					<span id="optionChooseBookmarkOther"></span>
+				</label>
+			</div>
+			<h3 id="optionChooseTheme"></h3>
+			<div>
+				<label>
+					<input type="radio" name="theme" value="default" id="default" checked="checked" />
+					<span id="optionChooseThemeDefault"></span>
+				</label>
+				<label>
+					<input type="radio" name="theme" value="sublime" id="sublime" />
+					<span id="optionChooseThemeSublime"></span>
+				</label>
+			</div>
+			<button type="submit" id="optionChooseSave"></button>
+		</form>
+	</body>
+</html>

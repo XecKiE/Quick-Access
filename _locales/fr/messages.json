@@ -1,0 +1,86 @@
+{
+	"extensionName": {
+		"message": "Accès rapide",
+		"description": "extension: name"
+	},
+
+	"extensionDescription": {
+		"message": "Accès rapides aux fonctionnalités du navigateur et aux favoris",
+		"description": "extension: description"
+	},
+
+	"optionChooseBookmark": {
+		"message": "Quels favoris voulez-vous charger dans l'extension ?",
+		"description": "option menu: bookmark's type"
+	},
+
+	"optionChooseBookmarkBar": {
+		"message": "Barre de favoris",
+		"description": "option menu: bookmarks bar"
+	},
+
+	"optionChooseBookmarkOther": {
+		"message": "Autres favoris",
+		"description": "option menu: bookmarks other"
+	},
+
+	"optionChooseTheme": {
+		"message": "Quel thème voulez-vous utiliser ?",
+		"description": "option menu: theme's choice"
+	},
+
+	"optionChooseThemeDefault": {
+		"message": "Par défaut",
+		"description": "option menu: theme default"
+	},
+
+	"optionChooseThemeSublime": {
+		"message": "Sublime Text",
+		"description": "option menu: theme sublime text"
+	},
+
+	"optionChooseSave": {
+		"message": "Sauvegarder",
+		"description": "option menu: save"
+	},
+
+	"chromeHistory": {
+		"message": "Chrome: Historique",
+		"description": "main menu: history"
+	},
+
+	"chromeDownloads": {
+		"message": "Chrome: Téléchargements",
+		"description": "main menu: downloads"
+	},
+
+	"chromeSettings": {
+		"message": "Chrome: Paramètres",
+		"description": "main menu: settings"
+	},
+
+	"chromeBookmarks": {
+		"message": "Chrome: Favoris",
+		"description": "main menu: bookmarks"
+	},
+
+	"chromeExtensions": {
+		"message": "Chrome: Extensions",
+		"description": "main menu: extensions"
+	},
+
+	"extensionAbout": {
+		"message": "Extension: À propos",
+		"description": "main menu: extension's about"
+	},
+
+	"extensionOptions": {
+		"message": "Extension: Options",
+		"description": "main menu: extension's options"
+	},
+
+	"bookmarks": {
+		"message": "Favoris",
+		"description": "main menu: bookmarks list"
+	}
+}
