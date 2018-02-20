@@ -1,29 +1,28 @@
 var keys = [];
 var theme = 'default';
+var browser_type = 'unknown';
 var fuzzy;
 var start_time = new Date().getTime();
 var previous_time = new Date().getTime();
 
 
-function monitor_reset() {
-	var t = new Date().getTime();
-	previous_time = t;
-}
-function monitor(text) {
-	var t = new Date().getTime();
-	console.log(text+': '+(t-previous_time)+' - since start: '+(t-start_time));
-	previous_time = t;
-}
-
-
 window.onload = function() {
-	monitor_reset();
 	var datas = ['fav_bar', 'fav_other', 'theme'];
 	if(typeof browser != 'undefined') {
+		browser_type = 'firefox';
+		//Those can't be open because of security reasons
+		/*keys = keys.concat([
+			{key: 'about:preferences', label: browser.i18n.getMessage('firefoxPreferences')},
+			{key: 'about:addons', label: browser.i18n.getMessage('firefoxAddons')},
+			{key: 'about:debugging', label: browser.i18n.getMessage('firefoxDebugging')},
+			{key: 'about:downloads', label: browser.i18n.getMessage('firefoxDownloads')},
+			{key: 'todo', label: browser.i18n.getMessage('extensionAbout')}
+		]);*/
 		browser.storage.local.get(datas).then(initialize, function(e) {
 			return fatal_error('Unknown error, you can try to update your navigator or report the bug on the Github page');
 		});
 	} else if(typeof chrome != 'undefined') {
+		browser_type = 'chrome';
 		browser = chrome;
 		keys = keys.concat([
 			{key: 'chrome://history/', label: browser.i18n.getMessage('chromeHistory')},
@@ -39,7 +38,6 @@ window.onload = function() {
 }
 
 function initialize(data) {
-	monitor('load_storage');
 	//Load the chosen theme
 	if(typeof data.theme != 'undefined') {
 		theme = data.theme;
@@ -48,22 +46,25 @@ function initialize(data) {
 	link.href = theme+'.css';
 	link.type = 'text/css';
 	link.rel = 'stylesheet';
-	link.media = 'screen,print';
 	document.getElementsByTagName('head')[0].appendChild(link);
 
 	//Load the bookmarks
-	monitor_reset();
 	browser.bookmarks.getTree(function(items) {
 		if(typeof data.fav_bar == 'undefined' || data.fav_bar) {
-			keys = keys.concat(recursive_bookmarks(items[0].children[0], 0, ''));
+			if(browser_type == 'chrome') {
+				keys = keys.concat(recursive_bookmarks(items[0].children[0], 0, ''));
+			} else if(browser_type == 'firefox') {
+				keys = keys.concat(recursive_bookmarks(items[0].children[0], 0, ''));
+			}
 		}
 		if(typeof data.fav_other != 'undefined' && data.fav_other) {
-			keys = keys.concat(recursive_bookmarks(items[0].children[1], 0, ''));
+			if(browser_type == 'chrome') {
+				keys = keys.concat(recursive_bookmarks(items[0].children[1], 0, ''));
+			} else if(browser_type == 'firefox') {
+				keys = keys.concat(recursive_bookmarks(items[0].children[2], 0, ''));
+			}
 		}
-		monitor('bookmarks');
-		monitor_reset();
 		fuzzy = new Fuzzy(document.getElementById('fuzzy'), keys, [], '', function() {}, open_url, function(){});
-		monitor('fuzzy');
 		fuzzy.get_focus();
 	});
 }
@@ -89,7 +90,7 @@ function recursive_bookmarks(items, nb, prefix) {
 
 function open_url(_url) {
 	browser.tabs.create({url: _url});
-	remove_breadcrumb();
+	//window.close();
 }
 
 function fatal_error(message) {

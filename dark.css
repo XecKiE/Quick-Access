@@ -5,12 +5,17 @@ html {
 body {
 	margin: 0;
 	background-color: #171814;
+	min-width: 500px;
+	height: 100%;
 }
 .fuzzy {
 	font-size: 16px;
 	position: relative;
 	background-color: #171814;
 	color: #d4d4d3;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
 }
 .fuzzy_dropdown {
 	margin-left: 1vh;

@@ -74,6 +74,26 @@
 		"description": "main menu: extensions"
 	},
 
+	"firefoxPreferences": {
+		"message": "Firefox: Préferences",
+		"description": "main menu: preferences"
+	},
+
+	"firefoxAddons": {
+		"message": "Firefox: Extensions",
+		"description": "main menu: extensions"
+	},
+
+	"firefoxDebugging": {
+		"message": "Firefox: Debugging",
+		"description": "main menu: debugging"
+	},
+
+	"firefoxDownloads": {
+		"message": "Firefox: Téléchargements",
+		"description": "main menu: downloads"
+	},
+
 	"extensionAbout": {
 		"message": "Extension: À propos",
 		"description": "main menu: extension's about"
