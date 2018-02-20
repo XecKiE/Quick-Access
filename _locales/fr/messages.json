@@ -30,8 +30,13 @@
 	},
 
 	"optionChooseThemeDefault": {
-		"message": "Par défaut",
+		"message": "Thème lumineux",
 		"description": "option menu: theme default"
+	},
+
+	"optionChooseThemeDark": {
+		"message": "Thème sombre",
+		"description": "option menu: theme dark"
 	},
 
 	"optionChooseThemeSublime": {

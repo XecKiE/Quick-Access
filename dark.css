@@ -1,0 +1,71 @@
+html {
+	min-width: 500px;
+	height: 500px;
+}
+body {
+	margin: 0;
+	background-color: #171814;
+}
+.fuzzy {
+	font-size: 16px;
+	position: relative;
+	background-color: #171814;
+	color: #d4d4d3;
+}
+.fuzzy_dropdown {
+	margin-left: 1vh;
+	margin-bottom: 1vh;
+	margin-right: 1vh;
+	border-radius: 1px;
+	border: 1px solid lightgrey;
+	position: relative;
+	height: 500px;
+	overflow-y: auto;
+}
+.fuzzy_dropdown > div {
+	color: lightgrey;
+	background-color: #171814;
+	padding: 1vh;
+	user-select: none;
+	cursor: pointer;
+}
+.fuzzy_dropdown > div:hover {
+	background-color: #303030;
+}
+.fuzzy_dropdown > div.fuzzy_selected {
+	color: #d4d4d3;
+	background-color: #3a3a37;
+}
+.fuzzy_text {
+	background-color: #272822;
+	border-radius: 1px;
+	border-left: 1px solid lightgrey;
+	border-top: 1px solid lightgrey;
+	border-right: 1px solid lightgrey;
+	margin-left: 1vh;
+	margin-top: 1vh;
+	margin-right: 1vh;
+	padding: 1vh;
+	cursor: text;
+}
+.fuzzy_text > span {
+	display: table-cell;
+}
+.fuzzy_input_parent {
+	width: 100%;
+}
+.fuzzy_input {
+	color: #d4d4d3;
+	font-size: 16px;
+	box-sizing: content-box;
+	outline: none;
+	margin: 0;
+	border: 0;
+	padding: 0;
+	width: 100%;
+	background: none;
+}
+.fuzzy_breadcrumb > span {
+	cursor: pointer;
+	white-space: nowrap;
+}

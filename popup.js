@@ -1,9 +1,23 @@
 var keys = [];
 var theme = 'default';
 var fuzzy;
+var start_time = new Date().getTime();
+var previous_time = new Date().getTime();
+
+
+function monitor_reset() {
+	var t = new Date().getTime();
+	previous_time = t;
+}
+function monitor(text) {
+	var t = new Date().getTime();
+	console.log(text+': '+(t-previous_time)+' - since start: '+(t-start_time));
+	previous_time = t;
+}
 
 
 window.onload = function() {
+	monitor_reset();
 	var datas = ['fav_bar', 'fav_other', 'theme'];
 	if(typeof browser != 'undefined') {
 		browser.storage.local.get(datas).then(initialize, function(e) {
@@ -25,9 +39,20 @@ window.onload = function() {
 }
 
 function initialize(data) {
+	monitor('load_storage');
+	//Load the chosen theme
 	if(typeof data.theme != 'undefined') {
 		theme = data.theme;
 	}
+	var link = document.createElement('link');
+	link.href = theme+'.css';
+	link.type = 'text/css';
+	link.rel = 'stylesheet';
+	link.media = 'screen,print';
+	document.getElementsByTagName('head')[0].appendChild(link);
+
+	//Load the bookmarks
+	monitor_reset();
 	browser.bookmarks.getTree(function(items) {
 		if(typeof data.fav_bar == 'undefined' || data.fav_bar) {
 			keys = keys.concat(recursive_bookmarks(items[0].children[0], 0, ''));
@@ -35,7 +60,10 @@ function initialize(data) {
 		if(typeof data.fav_other != 'undefined' && data.fav_other) {
 			keys = keys.concat(recursive_bookmarks(items[0].children[1], 0, ''));
 		}
+		monitor('bookmarks');
+		monitor_reset();
 		fuzzy = new Fuzzy(document.getElementById('fuzzy'), keys, [], '', function() {}, open_url, function(){});
+		monitor('fuzzy');
 		fuzzy.get_focus();
 	});
 }
@@ -296,7 +324,7 @@ class Fuzzy {
 				this.data[i].fuzzy_score = 0;
 				this.data[i].fuzzy_ghost = '';
 			}
-			this.data.sort(function(a, b) {return a.label.localeCompare(b.label, undefined, {numeric: true, sensitivity: 'base'});});
+			this.data.sort(function(a, b) {return /*if speed is an issue : a.label < b.label;*/a.label.localeCompare(b.label, undefined, {numeric: true, sensitivity: 'base'});});
 		}
 		while (this.d_dropdown.firstElementChild) {
 			this.d_dropdown.removeChild(this.d_dropdown.firstElementChild);
@@ -322,13 +350,7 @@ class Fuzzy {
 	};
 
 	get_focus() {
-		console.log(this.d_input);
-		(function(parent) {
-			setTimeout(function() {
-				console.log(parent.d_input);
-				console.log(parent.d_input.focus());
-			}, 1000);
-		})(this);
+		this.d_input.focus();
 	};
 
 	/**

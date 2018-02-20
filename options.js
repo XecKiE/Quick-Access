@@ -32,7 +32,7 @@ window.onload = function() {
 	}
 
 	//Load localisation
-	['optionChooseBookmark', 'optionChooseBookmarkBar', 'optionChooseBookmarkOther', 'optionChooseTheme', 'optionChooseThemeDefault', 'optionChooseThemeSublime', 'optionChooseSave'].forEach(function(element) {
+	['optionChooseBookmark', 'optionChooseBookmarkBar', 'optionChooseBookmarkOther', 'optionChooseTheme', 'optionChooseThemeDefault', 'optionChooseThemeDark', 'optionChooseThemeSublime', 'optionChooseSave'].forEach(function(element) {
 		document.getElementById(element).textContent = browser.i18n.getMessage(element);
 	});
 

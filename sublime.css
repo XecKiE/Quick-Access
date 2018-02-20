@@ -1,0 +1,81 @@
+html {
+	min-width: 500px;
+	height: 500px;
+}
+body {
+	margin: 0;
+	background-color: #171814;
+}
+.fuzzy {
+	position: relative;
+	background-color: #171814;
+	padding: 1vh;
+	color: #d4d4d3;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 300;
+	font-size: 16px;
+}
+.fuzzy_dropdown {
+	position: relative;
+	height: 500px;
+	overflow-y: auto;
+}
+.fuzzy_dropdown > div {
+	color: #a9a999;
+	background-color: #171814;
+	padding: 1vh;
+	user-select: none;
+	cursor: pointer;
+}
+.fuzzy_dropdown > div.fuzzy_selected {
+	color: #d4d4d3;
+	background-color: #3a3a37;
+}
+.fuzzy_text {
+	border-radius: 1px;
+	background-color: #272822;
+	padding: 1vh;
+	margin-bottom: 1vh;
+	cursor: text;
+}
+.fuzzy_text > span {
+	display: table-cell;
+}
+.fuzzy_input_parent {
+	width: 100%;
+}
+.fuzzy_input {
+	color: #d4d4d3;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 300;
+	font-size: 16px;
+	box-sizing: content-box;
+	outline: none;
+	margin: 0;
+	border: 0;
+	padding: 0;
+	width: 100%;
+	background: none;
+}
+.fuzzy_breadcrumb > span {
+	cursor: pointer;
+	white-space: nowrap;
+}
+::-webkit-scrollbar-track
+{
+	background-color: #292a26;
+	border-radius: 2px;
+	border-left: 1vh solid #171814;
+}
+::-webkit-scrollbar
+{
+	width: 2vh;
+	background-color: #292a26;
+	border-radius: 2px;
+}
+::-webkit-scrollbar-thumb
+{
+	background-color: #484946;
+	border-radius: 2px;
+	border-left: 1vh solid #171814;
+}*/
