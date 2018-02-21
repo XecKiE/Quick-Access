@@ -4,6 +4,7 @@ This WebExtension is a handy tool used to navigate more easily in your browser's
 
 ## Use
 Press Ctrl+Shift+F to access the menu. Type a few letters, and that's it !
+
 Before Firefox 60, you need to click on the popup to focus it.
 
 ## Installation
