@@ -6,8 +6,19 @@ var start_time = new Date().getTime();
 var previous_time = new Date().getTime();
 
 
+function monitor_reset() {
+	previous_time = new Date().getTime();
+}
+
+function monitor(name) {
+	var t = new Date().getTime();
+	console.log(name+': '+(t-previous_time)+' - since start:'+(t-start_time));
+	previous_time = t;
+}
+
 window.onload = function() {
 	var datas = ['fav_bar', 'fav_other', 'theme'];
+monitor_reset();
 	if(typeof browser != 'undefined') {
 		browser_type = 'firefox';
 		//Those can't be open because of security reasons
@@ -38,6 +49,7 @@ window.onload = function() {
 }
 
 function initialize(data) {
+monitor('storage');
 	//Load the chosen theme
 	if(typeof data.theme != 'undefined') {
 		theme = data.theme;
@@ -47,7 +59,8 @@ function initialize(data) {
 	link.type = 'text/css';
 	link.rel = 'stylesheet';
 	document.getElementsByTagName('head')[0].appendChild(link);
-
+	document.getElementById('fuzzy').style.display = '';
+monitor_reset();
 	//Load the bookmarks
 	browser.bookmarks.getTree(function(items) {
 		if(typeof data.fav_bar == 'undefined' || data.fav_bar) {
@@ -64,7 +77,9 @@ function initialize(data) {
 				keys = keys.concat(recursive_bookmarks(items[0].children[2], 0, ''));
 			}
 		}
-		fuzzy = new Fuzzy(document.getElementById('fuzzy'), keys, [], '', function() {}, open_url, function(){});
+		monitor('bookmarks');
+		fuzzy = new Fuzzy(document.getElementById('fuzzy'), keys, open_url, function() {}, function() {}, [], '');
+		monitor('fuzzy');
 		fuzzy.get_focus();
 	});
 }
@@ -107,16 +122,22 @@ function fatal_error(message) {
 
 /**
  * Create a fuzzy search on an element
- * @param      {dom} _d_parent        The parent dom element (should follow the structure given in the sample)
- * @param    {array} _data            An array list of the elements to search, they should have the following structure : {key: UNIQUE_ID, fuzzy: [EXTRA_SEARCHABLE_STRING], label: LABEL_OF_THE_ROW}
- * @param    {array} _breadcrumb      The current breadcrumb (should be an empty array if none)
- * @param   {string} _breadcrumb_text The current input text
- * @param {function} _on_input        When a character is inputed, this function will be called
- * @param {function} _on_select       When an element is selected, this function will be called
- * @param {function} _on_goback       When an element is selected (on go back), this function will be called
+ * @param      {dom} _d_parent          The parent dom element (should follow the structure given in the sample)
+ * @param    {array} _data              An array list of the elements to search, they should have the following structure : {key: UNIQUE_ID, fuzzy: [EXTRA_SEARCHABLE_STRING], label: LABEL_OF_THE_ROW}
+ * @param {function} [_on_select]       When an element is selected, this function will be called
+ * @param {function} [_on_goback]       When an element is selected (on go back), this function will be called
+ * @param {function} [_on_input]        When a character is inputed, this function will be called
+ * @param    {array} [_breadcrumb]      The current breadcrumb (should be an empty array if none)
+ * @param   {string} [_breadcrumb_text] The current input text
  */
 class Fuzzy {
-	constructor(_d_parent, _data, _breadcrumb, _breadcrumb_text, _on_input, _on_select, _on_goback) {
+	constructor(_d_parent, _data, _on_select, _on_goback, _on_input, _breadcrumb, _breadcrumb_text) {
+		if(!_breadcrumb) {
+			_breadcrumb = [];
+		}
+		if(!_breadcrumb_text) {
+			_breadcrumb_text = '';
+		}
 		this.d_parent = _d_parent;
 		this.data = _data;
 		this.on_input = _on_input;
@@ -181,7 +202,7 @@ class Fuzzy {
 					}
 					event.preventDefault();
 				} else {
-					setTimeout(function() {parent.refresh_dropdown();parent.on_input();}, 0);
+					setTimeout(function() {parent.refresh_dropdown();if(parent.on_input)parent.on_input();}, 0);
 				}
 			});
 		})(this);
@@ -216,7 +237,9 @@ class Fuzzy {
 				label: selected.label
 			});
 			this.d_input.value = '';
-			this.on_select(this.d_selected.dataset.key);
+			if(this.on_select) {
+				this.on_select(this.d_selected.dataset.key);
+			}
 			this.refresh_breadcrumb();
 		}
 	}
@@ -236,7 +259,9 @@ class Fuzzy {
 		}
 		this.breadcrumb.splice(index+1);
 		this.d_input.value = '';
-		this.on_goback(key);
+		if(this.on_goback) {
+			this.on_goback(key);
+		}
 		this.refresh_breadcrumb();
 	}
 
@@ -266,54 +291,157 @@ class Fuzzy {
 	refresh_dropdown() {
 		var pattern = this.d_input.value;
 		if(pattern !== '') {
+
+			//For each element to sort
 			for(var i=0 ; i<this.data.length ; i++) {
 				var t = [this.data[i].label],
 					sf = -11111111,
+					indexes,
 					sfg = '';
-				if(this.data[i].label != this.data[i].label.normalize('NFD').replace(/[\u0300-\u036f]/g, '')) {
-					t.push(this.data[i].label.normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
-				}
 				if(typeof this.data[i].fuzzy != 'undefined') {
 					for(var j=0 ; j<this.data[i].fuzzy.length ; j++) {
 						t.push(this.data[i].fuzzy[j]);
-						if(this.data[i].fuzzy[j] != this.data[i].fuzzy[j].normalize('NFD').replace(/[\u0300-\u036f]/g, '')) {
-							t.push(this.data[i].fuzzy[j].normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
-						}
 					}
 				}
+
+				//Search for the best match available between strings
 				for(var l=0 ; l<t.length ; l++) {
-					var s = 0;
-					var pm = true;
-					var k = 0;
-					for(var j=0 ; j<t[l].length ; j++) {
-						if(k < pattern.length && t[l].charAt(j).toLowerCase() == pattern.charAt(k).toLowerCase()) {
-							if(pm) {
-								s += 5;
+					var s=0, p=0,
+						str = t[l].split(''),
+						str_normalized = t[l].normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(''),
+						str_normalized_lower = t[l].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(''),
+						str_lower = t[l].toLowerCase().split(''),
+						str_upper = t[l].toUpperCase().split(''),
+						pat = pattern.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(''),
+						typo1 = false,
+						typo2 = false,
+						cs = 0,
+						indexes1 = [],
+						indexes2 = [],
+						found1 = false,
+						found2 = false,
+						ci = null,
+						tmp;
+					//First we get all approximate matches (letters all presents in the right order, with one order typo max)
+					while(true) {
+						if(p == pat.length) {
+							//Found string
+							found1 = true;
+							break;
+						} else if(s == str.length) {
+							//Didn't found string, test next typo
+							if(p < 2) {
+								break;
+							} else if(typo1 === false) {
+								typo1 = p;
+							} else if(typo1 > 2) {
+								typo1--;
+								tmp = pat[typo1];
+								pat[typo1] = pat[typo1+1];
+								pat[typo1+1] = tmp;
+							} else {
+								break;
 							}
-							if(j == 0) {
-								s += 10;
-							} else if((t[l].charAt(j-1) < 'a' || t[l].charAt(j-1) > 'z') && (t[l].charAt(j-1) < 'A' || t[l].charAt(j-1) > 'Z')) {
-								s += 10;
-							} else if((t[l].charAt(j-1) > 'a' && t[l].charAt(j-1) < 'z') && (t[l].charAt(j) > 'A' && t[l].charAt(j) < 'Z')) {
-								s += 10;
-							}
-							pm = true;
-							k++;
+							s = typo1>1?indexes1[typo1-2]:0;
+							indexes1.splice(typo1-1);
+							p = typo1-1;
+							tmp = pat[typo1];
+							pat[typo1] = pat[p];
+							pat[p] = tmp;
 						} else {
-							pm = false;
-							s--;
+							if(pat[p] == str_normalized_lower[s]) {
+								indexes1.push(s)
+								p++;
+							}
+							s++;
 						}
 					}
-					if(k >= pattern.length && s > sf) {
-						sf = s;
+
+					if(!found1) {
+						continue;
+					}
+
+					pat = pattern.split('');
+					s=0; p=0;
+
+					//Then we get all strict matches (only start of word or consecutive letters) (letters all presents in the right order, with one order typo max)
+					while(true) {
+						if(p == pat.length) {
+							//Found string
+							found2 = true;
+							break;
+						} else if(s == str.length) {
+							//Didn't found string, test next typo
+							if(p < 1) {
+								break;
+							} else if(typo2 === false) {
+								typo2 = p;
+							} else if(typo2 > 2) {
+								typo2--;
+								tmp = pat[typo2];
+								pat[typo2] = pat[typo2+1];
+								pat[typo2+1] = tmp;
+							} else {
+								break;
+							}
+							s = typo2>0?indexes2[typo2-1]:0;
+							indexes2.splice(typo2-1);
+							p = typo2-1;
+							tmp = pat[typo2];
+							pat[typo2] = pat[p];
+							pat[p] = tmp;
+						} else {
+							if(pat[p] == str_normalized_lower[s] &&
+								(
+									s == 0 ||
+									(str_lower[s-1] == str_upper[s-1]) ||
+									(str[s] == str_upper[s] && str[s-1] == str_lower[s-1]) || 
+									(indexes2[p-1] == s-1)
+								)) {
+								indexes2.push(s);
+								p++;
+							}
+							s++;
+						}
+					}
+
+					//Get the correct indexes
+					if(found2) {
+						ci = indexes2;
+					} else {
+						ci = indexes1;
+					}
+
+					//Score calculation
+					var last = -1;
+					for(var k=0 ; k<ci.length ; k++) {
+						if(last !== ci[k]) {
+							cs -= ci[k];
+						}
+						last = ci[k];
+					}
+
+					if(found2) {
+						if(typo2) {
+							cs -= 20;
+						}
+					} else {
+						cs *= 1000;
+						if(typo1) {
+							cs -= 20;
+						}
+					}
+					cs -= t[l].length - pattern.length;
+
+					//Get the best results
+					if(cs > sf) {
+						sf = cs;
+						indexes = ci;
 						sfg = t[l];
 					}
 				}
 				this.data[i].fuzzy_score = sf;
-				var sfg2 = sfg.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-				var comp = this.data[i].label;
-				var comp2 = comp.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-				if(sfg != comp && sfg2 != comp && sfg != comp2 && sfg2 != comp2) {
+				if(sfg != this.data[i].label) {
 					this.data[i].fuzzy_ghost = sfg;
 				} else {
 					this.data[i].fuzzy_ghost = '';
@@ -325,7 +453,7 @@ class Fuzzy {
 				this.data[i].fuzzy_score = 0;
 				this.data[i].fuzzy_ghost = '';
 			}
-			this.data.sort(function(a, b) {return /*if speed is an issue : a.label < b.label;*/a.label.localeCompare(b.label, undefined, {numeric: true, sensitivity: 'base'});});
+			this.data.sort(function(a, b) {return /*a.label < b.label;*//*if speed is not an issue : */a.label.localeCompare(b.label, undefined, {numeric: true, sensitivity: 'base'});});
 		}
 		while (this.d_dropdown.firstElementChild) {
 			this.d_dropdown.removeChild(this.d_dropdown.firstElementChild);
